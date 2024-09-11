@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { Book, RefreshCw, AlertCircle } from "lucide-react";
 import PageTitle from "../PageTitle";
+import api from "../utils/api";
 
 function Classification() {
   const [bibliographicRecords, setBibliographicRecords] = useState([]);
@@ -15,7 +15,7 @@ function Classification() {
   useEffect(() => {
     const fetchBibliographicRecords = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/bibliographic");
+        const response = await api.get("/bibliographic");
         const uniqueRecords = response.data.filter(
           (record, index, self) =>
             index === self.findIndex((r) => r.isbn === record.isbn),
@@ -79,16 +79,9 @@ function Classification() {
     setIsSubmitting(true);
 
     try {
-      const response = await axios.post(
-        "http://localhost:3000/classification/classify",
-        { bibliographicId: selectedBibliographicId },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-        },
-      );
+      const response = await api.post("/classification/classify", {
+        bibliographicId: selectedBibliographicId,
+      });
       setMessage(response.data.message);
       setMessageType(
         response.data.message === "Classification already exists"

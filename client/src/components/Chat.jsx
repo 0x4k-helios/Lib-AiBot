@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
-import axios from "axios";
 import ReactMarkdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { FaInfoCircle, FaBook, FaExclamationTriangle } from "react-icons/fa";
 import CatalogedBooks from "./CatalogedBooks";
+import api from "../utils/api";
 
 const Chat = ({ initialQuery, onQueryChange }) => {
   const [query, setQuery] = useState(initialQuery || "");
@@ -56,16 +56,7 @@ const Chat = ({ initialQuery, onQueryChange }) => {
     shouldScrollRef.current = true;
 
     try {
-      const response = await axios.post(
-        "http://localhost:3000/query",
-        { query },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-        },
-      );
+      const response = await api.post("/query", { query });
 
       const responseData = response.data;
       console.log("Response Data:", responseData);
@@ -456,8 +447,8 @@ const CatalogingPanel = ({ book, onClose, onCatalogSuccess }) => {
         return;
       }
 
-      const response = await axios.post(
-        `http://localhost:3000/create/catalog/${identifier}`,
+      const response = await api.post(
+        `/create/catalog/${identifier}`,
         dataToSubmit,
       );
       if (response.data.success) {

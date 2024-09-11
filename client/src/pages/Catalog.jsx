@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { Book, RefreshCw, AlertCircle, Calendar } from "lucide-react";
 import BreadcrumbNav from "../components/BreadCrumbNav";
 import PageTitle from "../PageTitle";
+import api from "../utils/api";
 
 function Catalog() {
   const [formData, setFormData] = useState({
@@ -83,18 +83,10 @@ function Catalog() {
     setIsSubmitting(true);
 
     try {
-      const response = await axios.post(
-        "http://localhost:3000/bibliographic/create",
-        {
-          ...formData,
-          publicationDate: formData.publicationDate.toISOString().split("T")[0],
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
-      );
+      const response = await api.post("/bibliographic/create", {
+        ...formData,
+        publicationDate: formData.publicationDate.toISOString().split("T")[0],
+      });
       setMessage(response.data.message);
       setMessageType("success");
       setGeneratedMetadata(response.data.marc21Record);

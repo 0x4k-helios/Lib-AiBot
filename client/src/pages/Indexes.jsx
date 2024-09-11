@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import PageTitle from "../PageTitle";
+import api from "../utils/api";
 
 const Indexes = () => {
   const [bibliographicRecords, setBibliographicRecords] = useState([]);
@@ -52,7 +52,7 @@ const Indexes = () => {
 
   const fetchBibliographicRecords = async () => {
     try {
-      const response = await axios.get("http://localhost:3000/bibliographic");
+      const response = await api.get("/bibliographic");
       const uniqueRecords = response.data.filter(
         (record, index, self) =>
           index === self.findIndex((r) => r.isbn === record.isbn),
@@ -70,9 +70,7 @@ const Indexes = () => {
   const fetchExistingHeadings = async () => {
     setIsLoadingExistingHeadings(true);
     try {
-      const response = await axios.get(
-        "http://localhost:3000/headings/generate-headings",
-      );
+      const response = await api.get("/headings/generate-headings");
       setExistingHeadings(response.data);
     } catch (error) {
       console.error("Error fetching existing headings:", error);
@@ -120,16 +118,7 @@ const Indexes = () => {
     setIsSubmittingHeadings(true);
 
     try {
-      const response = await axios.post(
-        "http://localhost:3000/headings/generate-headings",
-        mappings,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-        },
-      );
+      const response = await api.post("/headings/generate-headings", mappings);
       const { message, newHeadings, existingHeadings, summary } = response.data;
 
       setGenerationSummary(summary);
@@ -157,9 +146,7 @@ const Indexes = () => {
 
   const handleDeleteHeading = async (ddcCode) => {
     try {
-      await axios.delete(
-        `http://localhost:3000/headings/generate-headings/${ddcCode}`,
-      );
+      await api.delete(`/headings/generate-headings/${ddcCode}`);
       showMessage(`DDC code ${ddcCode} deleted successfully.`, "success");
       fetchExistingHeadings(); // Refresh the list of existing headings
     } catch (error) {
@@ -179,16 +166,9 @@ const Indexes = () => {
     setIsSubmittingSubjectHeadings(true);
 
     try {
-      const response = await axios.post(
-        "http://localhost:3000/subjectHeading/generate",
-        { bibliographicId: selectedBibliographicId },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-        },
-      );
+      const response = await api.post("/subjectHeading/generate", {
+        bibliographicId: selectedBibliographicId,
+      });
       if (response.data.subjectHeading) {
         showMessage("Subject headings generated successfully.", "success");
         setSubjectHeadings(response.data.subjectHeading);
