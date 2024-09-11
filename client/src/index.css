@@ -1,0 +1,50 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: "Roboto", sans-serif;
+  }
+}
+
+@layer components {
+  .loader {
+    @apply h-4 w-4 animate-spin rounded-full border-2 border-solid border-gray-300 border-t-transparent text-center;
+  }
+}
+
+.markdown-body h1 {
+  font-size: 1.5em;
+  margin-top: 1em;
+  margin-bottom: 0.5em;
+  font-weight: bold;
+}
+
+.markdown-body h2 {
+  font-size: 1.25em;
+  margin-bottom: 0.5em;
+  font-weight: bold;
+}
+
+.markdown-body p {
+  margin-bottom: 0.5em;
+}
+
+.markdown-body ul,
+.markdown-body ol {
+  margin-bottom: 0.5em;
+  padding-left: 1.5em;
+}
+
+.markdown-body li {
+  margin-bottom: 0.25em;
+}
+
+.markdown-body strong {
+  font-weight: bold;
+}
+
+.markdown-body em {
+  font-style: italic;
+}
