@@ -1,25 +1,30 @@
 # LibCatalog
 
-LibCatalog is a comprehensive library management system that combines traditional cataloging methods with AI-assisted features to streamline the process of organizing and managing library resources.
+LibCatalog is a modern, comprehensive library management system that combines traditional cataloging methods with AI-assisted features to streamline the process of organizing and managing library resources.
 
 ## Features
 
-- **Manual Cataloging**: Create and edit bibliographic records manually, generate MARC21 data, and assign initial classifications.
-- **AI-Assisted Cataloging**: Leverage AI to automatically generate bibliographic records, suggest classifications, and streamline the cataloging process.
-- **Classification Tools**: Verify existing classifications or convert between Dewey Decimal (DDC) and Library of Congress (LCC) systems.
-- **Index Management**: Create and manage subject headings, generate indexes for your catalog, and organize your collection.
-- **Authority Control**: Manage authorized headings, extract and standardize metadata, and ensure consistency across your catalog.
-- **Integration with Open Library and Google Books APIs**: Fetch and supplement book information from these extensive databases.
+- **Manual Cataloging**: Create and edit bibliographic records manually.
+- **AI-Assisted Cataloging**: Leverage AI to automate and enhance the cataloging process.
+- **Classification Tools**: Work with Dewey Decimal (DDC) and Library of Congress (LCC) systems.
+- **Index Management**: Create and manage subject headings and indexes.
+- **Authority Control**: Ensure consistency across your catalog.
+- **User-Friendly Interface**: Easy-to-use React-based frontend for efficient library management.
+
+## Project Structure
+
+The project is divided into two main parts:
+
+- `client/`: React-based frontend application
+- `server/`: Node.js/Express backend server
 
 ## Prerequisites
 
-Before you begin, ensure you have met the following requirements:
-
 - Node.js (v14.0.0 or later)
-- MongoDB
 - npm or yarn
+- MongoDB
 
-## Installation
+## Quick Start
 
 1. Clone the repository:
 
@@ -28,53 +33,30 @@ Before you begin, ensure you have met the following requirements:
    cd libcatalog
    ```
 
-2. Install the dependencies:
+2. Set up the backend:
 
    ```
+   cd server
    npm install
+   cp .env.example .env
+   # Edit .env with your configuration
+   npm start
    ```
 
-3. Create a `.env` file in the root directory and add the following:
+3. Set up the frontend:
 
    ```
-   GOOGLE_AI_API_KEY=your_google_ai_api_key
-   PORT=3000
-   MONGODB_URI=your_mongodb_connection_string
+   cd ../client
+   npm install
+   npm start
    ```
 
-   Replace `your_google_ai_api_key` and `your_mongodb_connection_string` with your actual Google AI API key and MongoDB connection string.
+4. Open your browser and navigate to `http://localhost:3000` for backend and `http://localhost:5173` for frontend to use LibCatalog.
 
-## Usage
-
-To start the server:
-
-```
-npm start
-```
-
-The server will start running on `http://localhost:3000` (or the port specified in your .env file).
-
-## API Endpoints
-
-- `/query`: POST - Send queries for book information or classification conversion
-- `/create/catalog/:identifier`: POST - Catalog a book using its identifier (ISBN or OpenLibrary ID)
-
-For a full list of endpoints and their usage, please refer to the API documentation.
-
-## Contributing
-
-Contributions to LibCatalog are welcome! Please refer to the `CONTRIBUTING.md` file for guidelines.
-
-## License
-
-This project is licensed under the MIT License - see the `LICENSE.md` file for details.
+For detailed setup instructions and configuration options, please refer to the documentation in the `client` and `server` directories.
 
 ## Acknowledgments
 
 - OpenLibrary API
 - Google Books API
 - Google Generative AI
-
-## Contact
-
-If you have any questions or feedback, please open an issue on the GitHub repository.
