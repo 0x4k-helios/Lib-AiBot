@@ -7,7 +7,6 @@ const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isCatalogOpen, setIsCatalogOpen] = useState(false);
-  const [isMobileCatalogOpen, setIsMobileCatalogOpen] = useState(false);
   const location = useLocation();
   const catalogRef = useRef(null);
 
@@ -45,15 +44,83 @@ const Header = () => {
   useEffect(() => {
     setIsMenuOpen(false);
     setIsCatalogOpen(false);
-    setIsMobileCatalogOpen(false);
   }, [location.pathname]);
 
   const toggleCatalog = () => {
     setIsCatalogOpen(!isCatalogOpen);
   };
 
-  const toggleMobileCatalog = () => {
-    setIsMobileCatalogOpen(!isMobileCatalogOpen);
+  const renderNavItems = (isMobile = false) => {
+    return navItems.map((item) => (
+      <div
+        key={item.path}
+        className={isMobile ? "" : "relative"}
+        ref={item.submenu ? catalogRef : null}
+      >
+        {item.submenu ? (
+          <>
+            <button
+              onClick={toggleCatalog}
+              className={`flex items-center justify-between rounded-md px-3 py-2 text-sm font-medium transition-colors duration-300 ${
+                location.pathname.startsWith(item.path)
+                  ? "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300"
+                  : "text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
+              } ${isMobile ? "w-full text-left" : ""}`}
+            >
+              {item.label}
+              <ChevronDown
+                className={`ml-1 h-4 w-4 transition-transform duration-200 ${isCatalogOpen ? "rotate-180" : ""}`}
+              />
+            </button>
+            {isCatalogOpen && (
+              <div
+                className={
+                  isMobile
+                    ? "ml-4 mt-1 space-y-1"
+                    : "absolute left-0 mt-2 w-48 origin-top-left rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-gray-800"
+                }
+              >
+                <div className={isMobile ? "" : "py-1"}>
+                  {item.submenu.map((subItem) => (
+                    <NavLink
+                      key={subItem.path}
+                      to={subItem.path}
+                      className={({ isActive }) =>
+                        `block px-4 py-2 text-sm ${
+                          isActive
+                            ? "bg-gray-100 text-blue-700 dark:bg-gray-700 dark:text-blue-300"
+                            : "text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700"
+                        } ${isMobile ? "rounded-md" : ""}`
+                      }
+                      onClick={() => {
+                        setIsMenuOpen(false);
+                        setIsCatalogOpen(false);
+                      }}
+                    >
+                      {subItem.label}
+                    </NavLink>
+                  ))}
+                </div>
+              </div>
+            )}
+          </>
+        ) : (
+          <NavLink
+            to={item.path}
+            className={({ isActive }) =>
+              `block rounded-md px-3 py-2 text-sm font-medium ${
+                isActive
+                  ? "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300"
+                  : "text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
+              } ${isMobile ? "w-full" : ""}`
+            }
+            onClick={() => isMobile && setIsMenuOpen(false)}
+          >
+            {item.label}
+          </NavLink>
+        )}
+      </div>
+    ));
   };
 
   return (
@@ -79,65 +146,7 @@ const Header = () => {
             <span className="absolute -bottom-1 left-0 h-0.5 w-0 bg-blue-600 transition-all duration-300 group-hover:w-full dark:bg-blue-400"></span>
           </NavLink>
 
-          <nav className="hidden space-x-1 md:flex">
-            {navItems.map((item) => (
-              <div
-                key={item.path}
-                className="relative"
-                ref={item.submenu ? catalogRef : null}
-              >
-                {item.submenu ? (
-                  <button
-                    onClick={toggleCatalog}
-                    className={`flex items-center rounded-md px-3 py-2 text-sm font-medium transition-colors duration-300 ${
-                      location.pathname.startsWith(item.path)
-                        ? "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300"
-                        : "text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
-                    }`}
-                  >
-                    {item.label}
-                    <ChevronDown
-                      className={`ml-1 h-4 w-4 transition-transform duration-200 ${isCatalogOpen ? "rotate-180" : ""}`}
-                    />
-                  </button>
-                ) : (
-                  <NavLink
-                    to={item.path}
-                    className={({ isActive }) =>
-                      `flex items-center rounded-md px-3 py-2 text-sm font-medium transition-colors duration-300 ${
-                        isActive
-                          ? "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300"
-                          : "text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
-                      }`
-                    }
-                  >
-                    {item.label}
-                  </NavLink>
-                )}
-                {item.submenu && isCatalogOpen && (
-                  <div className="absolute left-0 mt-2 w-48 origin-top-left rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-gray-800">
-                    <div className="py-1">
-                      {item.submenu.map((subItem) => (
-                        <NavLink
-                          key={subItem.path}
-                          to={subItem.path}
-                          className={({ isActive }) =>
-                            `block px-4 py-2 text-sm ${
-                              isActive
-                                ? "bg-gray-100 text-blue-700 dark:bg-gray-700 dark:text-blue-300"
-                                : "text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700"
-                            }`
-                          }
-                        >
-                          {subItem.label}
-                        </NavLink>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            ))}
-          </nav>
+          <nav className="hidden space-x-1 md:flex">{renderNavItems()}</nav>
 
           <div className="flex items-center space-x-4">
             <button
@@ -151,66 +160,7 @@ const Header = () => {
         </div>
 
         {isMenuOpen && (
-          <nav className="space-y-1 pb-4 md:hidden">
-            {navItems.map((item) => (
-              <div key={item.path}>
-                {item.submenu ? (
-                  <>
-                    <button
-                      onClick={toggleMobileCatalog}
-                      className={`flex w-full items-center justify-between rounded-md px-3 py-2 text-left text-base font-medium ${
-                        location.pathname.startsWith(item.path)
-                          ? "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300"
-                          : "text-gray-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800"
-                      }`}
-                    >
-                      {item.label}
-                      <ChevronDown
-                        className={`h-4 w-4 transition-transform duration-200 ${isMobileCatalogOpen ? "rotate-180" : ""}`}
-                      />
-                    </button>
-                    {isMobileCatalogOpen && (
-                      <div className="ml-4 mt-1 space-y-1">
-                        {item.submenu.map((subItem) => (
-                          <NavLink
-                            key={subItem.path}
-                            to={subItem.path}
-                            className={({ isActive }) =>
-                              `block rounded-md px-3 py-2 text-sm font-medium ${
-                                isActive
-                                  ? "bg-blue-50 text-blue-700 dark:bg-blue-900 dark:text-blue-300"
-                                  : "text-gray-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800"
-                              }`
-                            }
-                            onClick={() => {
-                              setIsMenuOpen(false);
-                              setIsMobileCatalogOpen(false);
-                            }}
-                          >
-                            {subItem.label}
-                          </NavLink>
-                        ))}
-                      </div>
-                    )}
-                  </>
-                ) : (
-                  <NavLink
-                    to={item.path}
-                    className={({ isActive }) =>
-                      `block rounded-md px-3 py-2 text-base font-medium ${
-                        isActive
-                          ? "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300"
-                          : "text-gray-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800"
-                      }`
-                    }
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    {item.label}
-                  </NavLink>
-                )}
-              </div>
-            ))}
-          </nav>
+          <nav className="space-y-1 pb-4 md:hidden">{renderNavItems(true)}</nav>
         )}
       </div>
     </header>
