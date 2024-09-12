@@ -6,7 +6,7 @@ import PageTitle from "../PageTitle";
 const HomePage = () => {
   const features = [
     {
-      to: "/catalog",
+      to: "/catalog/manual",
       icon: <Book className="h-8 w-8" />,
       title: "Manual Cataloging",
       description: "Create and edit bibliographic records manually.",
