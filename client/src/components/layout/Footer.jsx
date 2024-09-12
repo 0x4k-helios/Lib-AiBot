@@ -15,7 +15,7 @@ const Footer = () => {
             </p>
           </div>
           <NavLink
-            to={{ pathname: "https://github.com/NabsCodes/LibCatalog" }}
+            to={"https://github.com/NabsCodes/LibCatalog"}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center space-x-2 text-gray-600 hover:text-blue-500 dark:text-gray-300 dark:hover:text-blue-400"
