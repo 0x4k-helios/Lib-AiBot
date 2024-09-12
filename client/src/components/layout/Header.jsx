@@ -1,12 +1,13 @@
 import { useState, useEffect, useRef } from "react";
 import { NavLink, useLocation } from "react-router-dom";
-import { Menu, X, ChevronDown, BookOpen } from "lucide-react";
+import { Menu, X, ChevronDown } from "lucide-react";
 import ThemeToggle from "../ui/ThemeToggle";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isCatalogOpen, setIsCatalogOpen] = useState(false);
+  const [isMobileCatalogOpen, setIsMobileCatalogOpen] = useState(false);
   const location = useLocation();
   const catalogRef = useRef(null);
 
@@ -44,10 +45,15 @@ const Header = () => {
   useEffect(() => {
     setIsMenuOpen(false);
     setIsCatalogOpen(false);
+    setIsMobileCatalogOpen(false);
   }, [location.pathname]);
 
   const toggleCatalog = () => {
     setIsCatalogOpen(!isCatalogOpen);
+  };
+
+  const toggleMobileCatalog = () => {
+    setIsMobileCatalogOpen(!isMobileCatalogOpen);
   };
 
   return (
@@ -151,7 +157,7 @@ const Header = () => {
                 {item.submenu ? (
                   <>
                     <button
-                      onClick={toggleCatalog}
+                      onClick={toggleMobileCatalog}
                       className={`flex w-full items-center justify-between rounded-md px-3 py-2 text-left text-base font-medium ${
                         location.pathname.startsWith(item.path)
                           ? "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300"
@@ -160,10 +166,10 @@ const Header = () => {
                     >
                       {item.label}
                       <ChevronDown
-                        className={`h-4 w-4 transition-transform duration-200 ${isCatalogOpen ? "rotate-180" : ""}`}
+                        className={`h-4 w-4 transition-transform duration-200 ${isMobileCatalogOpen ? "rotate-180" : ""}`}
                       />
                     </button>
-                    {isCatalogOpen && (
+                    {isMobileCatalogOpen && (
                       <div className="ml-4 mt-1 space-y-1">
                         {item.submenu.map((subItem) => (
                           <NavLink
@@ -176,7 +182,10 @@ const Header = () => {
                                   : "text-gray-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800"
                               }`
                             }
-                            onClick={() => setIsMenuOpen(false)}
+                            onClick={() => {
+                              setIsMenuOpen(false);
+                              setIsMobileCatalogOpen(false);
+                            }}
                           >
                             {subItem.label}
                           </NavLink>
