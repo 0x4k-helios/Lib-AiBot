@@ -1,6 +1,6 @@
 import { Routes, Route } from "react-router-dom";
-import Catalog from "./pages/Catalog";
-import Layout from "./Layout";
+import ManualCatalog from "./pages/ManualCatalog";
+import Layout from "./components/layout/Layout";
 import HomePage from "./pages/HomePage";
 import Classification from "./pages/Classifcation";
 import AICatalog from "./pages/AICatalog";
@@ -13,7 +13,7 @@ function App() {
     <Layout>
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route path="/catalog" element={<Catalog />} />
+        <Route path="/catalog/manual" element={<ManualCatalog />} />
         <Route path="/catalog/ai" element={<AICatalog />} />
         <Route path="/classification" element={<Classification />} />
         <Route path="/indexes" element={<Indexes />} />

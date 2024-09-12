@@ -152,22 +152,39 @@ const Chat = ({ initialQuery, onQueryChange }) => {
   };
 
   return (
-    <div className="flex h-screen flex-col lg:flex-row">
-      <div className="mb-4 flex flex-grow flex-col rounded-md bg-gray-100 dark:bg-gray-800 lg:mb-32">
+    <div className="mb-32 flex flex-col gap-4 border border-gray-200 dark:border-gray-700 lg:h-screen lg:flex-row lg:gap-0 lg:rounded-lg">
+      <div className="flex flex-grow flex-col rounded-md bg-gray-100 dark:bg-gray-800">
         <div
           ref={chatContainerRef}
           className="flex-1 space-y-4 overflow-auto p-4"
         >
-          {messages.map((message, index) => (
-            <div
-              key={index}
-              className={`mx-auto max-w-2xl ${
-                message.type === "user" ? "text-right" : "text-left"
-              }`}
-            >
-              <MessageContent message={message} onCatalog={handleCatalog} />
+          {messages.length === 0 ? (
+            <div className="flex h-full flex-col items-center py-2 text-center">
+              <div className="mb-4 rounded-full bg-blue-100 p-3 dark:bg-blue-900">
+                <FaBook className="h-8 w-8 text-blue-500 dark:text-blue-300" />
+              </div>
+              <h2 className="mb-2 text-xl font-bold text-gray-700 dark:text-gray-300">
+                LibCatalog AI Assistant
+              </h2>
+              <p className="max-w-md text-sm text-gray-500 dark:text-gray-400 md:text-base">
+                Your intelligent companion for library management.
+              </p>
+              <p className="mt-4 text-xs text-gray-400 dark:text-gray-500 md:text-sm">
+                Start by asking a question or use a prompt suggestion above.
+              </p>
             </div>
-          ))}
+          ) : (
+            messages.map((message, index) => (
+              <div
+                key={index}
+                className={`mx-auto max-w-2xl ${
+                  message.type === "user" ? "text-right" : "text-left"
+                }`}
+              >
+                <MessageContent message={message} onCatalog={handleCatalog} />
+              </div>
+            ))
+          )}
           {isLoading && (
             <div className="mx-auto max-w-2xl text-left">
               <div className="inline-block animate-pulse rounded-lg bg-gray-300 p-2 text-black dark:bg-gray-700 dark:text-white">
@@ -177,28 +194,69 @@ const Chat = ({ initialQuery, onQueryChange }) => {
           )}
         </div>
 
-        <div className="fixed bottom-0 left-4 right-4 rounded-xl border border-gray-300 bg-white p-4 dark:border-gray-700 dark:bg-gray-900">
-          <form onSubmit={handleSubmit} className="flex flex-col space-y-2">
-            <div className="flex flex-col gap-2 md:flex-row">
-              <input
-                type="text"
-                value={query}
-                onChange={(e) => {
-                  setQuery(e.target.value);
-                  onQueryChange(e.target.value);
-                }}
-                placeholder="Ask about a book or any library-related question..."
-                className="flex-1 rounded border border-gray-300 p-2 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-              />
+        <div className="fixed bottom-0 left-1/2 w-full max-w-6xl -translate-x-1/2 px-4">
+          <div className="rounded-2xl border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800">
+            <form
+              onSubmit={handleSubmit}
+              className="flex items-end space-x-2 p-2"
+            >
+              <div className="relative flex-grow">
+                <input
+                  type="text"
+                  value={query}
+                  onChange={(e) => {
+                    setQuery(e.target.value);
+                    onQueryChange(e.target.value);
+                  }}
+                  placeholder="Ask about a book or any library-related question..."
+                  className="w-full rounded-xl border-0 bg-gray-100 py-3 pl-4 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                />
+              </div>
               <button
                 type="submit"
-                className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+                className="rounded-xl bg-blue-500 p-3 text-white transition-colors hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-blue-500"
                 disabled={isLoading}
               >
-                Send
+                {isLoading ? (
+                  <svg
+                    className="h-5 w-5 animate-spin text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                ) : (
+                  <svg
+                    className="h-5 w-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M14 5l7 7m0 0l-7 7m7-7H3"
+                    ></path>
+                  </svg>
+                )}
               </button>
-            </div>
-          </form>
+            </form>
+          </div>
         </div>
       </div>
       <CatalogedBooks catalogedBooks={catalogedBooks} />

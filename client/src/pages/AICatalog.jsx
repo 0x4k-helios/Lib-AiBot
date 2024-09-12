@@ -1,60 +1,85 @@
 import React, { useState } from "react";
 import Chat from "../components/Chat";
 import BreadcrumbNav from "../components/BreadCrumbNav";
-import { Database } from "lucide-react";
+import { Database, Search } from "lucide-react";
 import PageTitle from "../PageTitle";
 
 const AICatalog = () => {
   const [query, setQuery] = useState("");
 
   const promptSuggestions = [
-    "Find information about the book 'The Great Gatsby' by F. Scott Fitzgerald",
-    "Suggest books similar to 'To Kill a Mockingbird'",
-    "Convert Dewey Decimal Classification 823.912 to Library of Congress Classification",
-    "Find books by J.K. Rowling",
-    "What's the Dewey Decimal classification for astronomy?",
+    "Find information about the book 'To Kill a Mockingbird' by Harper Lee",
+    "Search for books by Gabriel García Márquez",
+    "Get details for the novel '1984' by George Orwell",
+    "Find books in the Harry Potter series",
+    "Look up information on 'The Great Gatsby' by F. Scott Fitzgerald",
+    "Search for books by Jane Austen",
+    "Find information about 'The Catcher in the Rye' by J.D. Salinger",
+    "Get details for 'Pride and Prejudice'",
+    "Search for books by Stephen King",
+    "Find information about 'The Hobbit' by J.R.R. Tolkien",
+    "Get details for 'Brave New World' by Aldous Huxley",
+    "Search for books in the Lord of the Rings series",
+    "Find information about 'The Chronicles of Narnia'",
+    "Get details for 'Fahrenheit 451' by Ray Bradbury",
+    "Search for books by Agatha Christie",
   ];
+
+  const getRandomSuggestions = (count = 6) => {
+    return [...promptSuggestions]
+      .sort(() => 0.5 - Math.random())
+      .slice(0, count);
+  };
+
+  const displayedSuggestions = getRandomSuggestions();
 
   const handleSuggestionClick = (suggestion) => {
     setQuery(suggestion);
   };
 
   return (
-    <section className="min-h-screen bg-gradient-to-b from-blue-50 to-white px-2 py-6 dark:from-gray-900 dark:to-gray-800 dark:text-white sm:px-4 sm:py-12">
+    <section className="min-h-screen bg-gradient-to-b from-blue-50 to-white px-4 py-6 dark:from-gray-900 dark:to-gray-800 dark:text-white sm:py-12">
       <PageTitle title="AI Catalog" />
       <div className="container mx-auto max-w-6xl">
         <BreadcrumbNav />
-        <div className="mb-4 flex flex-col items-center justify-center sm:mb-6 sm:flex-row">
-          <Database className="mb-2 h-5 w-5 text-blue-500 sm:mb-0 sm:mr-2 sm:h-6 sm:w-6" />
-          <h1 className="text-center text-xl font-semibold sm:text-2xl">
-            Interact with the AI to catalog your books.
+        <div className="mb-6 text-center">
+          <div className="mb-4 inline-flex items-center justify-center rounded-full bg-blue-100 p-2 dark:bg-blue-900">
+            <Database className="h-8 w-8 text-blue-500 dark:text-blue-300" />
+          </div>
+          <h1 className="text-2xl font-bold sm:text-3xl">
+            AI-Assisted Book Catalog
           </h1>
+          <p className="mt-2 text-gray-600 dark:text-gray-400">
+            Search, find, and catalog books with our AI assistant
+          </p>
         </div>
 
-        {/* Refined Beta Notice */}
-        <div className="mb-4 text-center">
-          <span className="inline-block rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800 shadow-sm dark:bg-blue-900 dark:text-blue-200 sm:px-3">
-            AI Catalog Beta • This is a preview. May produce inaccurate results.
-          </span>
-        </div>
-
-        <div className="mb-4 rounded-lg bg-slate-200 p-3 dark:bg-slate-700 sm:p-4">
-          <h2 className="mb-2 text-base font-semibold sm:text-lg">
-            Prompt Suggestions:
-          </h2>
-          <ul className="list-disc pl-4 text-sm sm:pl-5 sm:text-base">
-            {promptSuggestions.map((suggestion, index) => (
-              <li
+        <div className="mb-6 rounded-xl bg-white p-4 shadow-lg dark:bg-gray-800">
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
+              Try These Searches
+            </h2>
+            <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+              Beta
+            </span>
+          </div>
+          <div className="grid gap-2 sm:grid-cols-2 md:grid-cols-3">
+            {displayedSuggestions.map((suggestion, index) => (
+              <button
                 key={index}
-                className="mb-1 cursor-pointer text-blue-600 hover:underline dark:text-blue-400 sm:mb-2"
+                className="flex items-center rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
                 onClick={() => handleSuggestionClick(suggestion)}
               >
-                {suggestion}
-              </li>
+                <Search className="mr-2 h-4 w-4 flex-shrink-0" />
+                <span className="truncate">{suggestion}</span>
+              </button>
             ))}
-          </ul>
+          </div>
         </div>
-        <Chat initialQuery={query} onQueryChange={setQuery} />
+
+        <div className="rounded-xl bg-white shadow-lg dark:bg-gray-800">
+          <Chat initialQuery={query} onQueryChange={setQuery} />
+        </div>
       </div>
     </section>
   );

@@ -6,7 +6,7 @@ import BreadcrumbNav from "../components/BreadCrumbNav";
 import PageTitle from "../PageTitle";
 import api from "../utils/api";
 
-function Catalog() {
+function ManualCatalog() {
   const [formData, setFormData] = useState({
     title: "",
     author: "",
@@ -250,4 +250,4 @@ function Catalog() {
   );
 }
 
-export default Catalog;
+export default ManualCatalog;

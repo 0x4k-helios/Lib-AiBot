@@ -1,68 +1,67 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { NavLink, useLocation } from "react-router-dom";
+import { ChevronRight, Home, Book, Database } from "lucide-react";
 
 const BreadcrumbNav = () => {
-  const [breadcrumb, setBreadcrumb] = useState("Manual Entry"); // Initial breadcrumb value Path
-  // Add breadcrumb links here
+  const location = useLocation();
+
   const breadcrumbLinks = [
+    { to: "/", label: "Home", icon: <Home size={16} /> },
     {
-      to: "/catalog",
-      label: "Manual Entry",
+      to: "/catalog/manual",
+      label: "Manual Cataloging",
+      icon: <Book size={16} />,
     },
     {
       to: "/catalog/ai",
-      label: "AI Entry",
+      label: "AI-Assisted Cataloging",
+      icon: <Database size={16} />,
     },
   ];
 
-  // Set breadcrumb based on current location
-  const location = useLocation();
+  const getCurrentCrumb = () => {
+    const currentPath = location.pathname;
+    if (currentPath === "/") return null; // Don't show breadcrumb on homepage
+    const currentLink = breadcrumbLinks.find((link) => link.to === currentPath);
+    return currentLink
+      ? [breadcrumbLinks[0], currentLink]
+      : [breadcrumbLinks[0]];
+  };
 
-  useEffect(() => {
-    breadcrumbLinks.forEach((link) => {
-      if (link.to === location.pathname) {
-        setBreadcrumb(link.label);
-      }
-    });
-  }, [location.pathname]); // Update breadcrumb when location changes
+  const currentCrumbs = getCurrentCrumb();
+
+  if (!currentCrumbs) return null;
 
   return (
-    <>
-      <nav className="flex" aria-label="Breadcrumb">
-        <ol className="inline-flex items-center space-x-1 md:space-x-3">
-          {breadcrumbLinks.map((link, index) => (
-            <li key={index} className="inline-flex items-center">
-              {index > 0 && (
-                <div className="flex items-center">
-                  <svg
-                    className="h-6 w-6 text-gray-400"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path d="M7 10a1 1 0 011-1h4a1 1 0 110 2H8a1 1 0 01-1-1z" />
-                  </svg>
-                </div>
-              )}
-              <NavLink
-                to={link.to}
-                className={({ isActive }) =>
-                  `inline-flex items-center text-sm font-medium transition-all duration-300 ${
-                    isActive
-                      ? "text-blue-600 dark:text-white"
-                      : "text-gray-700 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white"
-                  } ${index > 0 ? "ml-1 md:ml-2" : ""}`
-                }
-                end
-              >
-                {link.label}
-              </NavLink>
-            </li>
-          ))}
-        </ol>
-      </nav>
-      <div className="my-4 border border-slate-900/30 dark:border-slate-500/60"></div>
-    </>
+    <nav
+      className="flex items-center space-x-2 py-4 text-sm"
+      aria-label="Breadcrumb"
+    >
+      {currentCrumbs.map((link, index) => (
+        <React.Fragment key={link.to}>
+          {index > 0 && (
+            <ChevronRight
+              size={16}
+              className="text-gray-400 dark:text-gray-500"
+            />
+          )}
+          <NavLink
+            to={link.to}
+            className={({ isActive }) =>
+              `flex items-center space-x-1 rounded-md px-2 py-1 transition-all duration-300 ${
+                isActive
+                  ? "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300"
+                  : "text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800"
+              }`
+            }
+            end
+          >
+            {link.icon && <span className="mr-1">{link.icon}</span>}
+            <span>{link.label}</span>
+          </NavLink>
+        </React.Fragment>
+      ))}
+    </nav>
   );
 };
 

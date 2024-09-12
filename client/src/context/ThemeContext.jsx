@@ -1,5 +1,5 @@
 import { createContext, useState, useEffect } from "react";
-import { changeFavicon } from "../changeFavicon";
+import { changeFavicon } from "../utils/changeFavicon";
 
 export const ThemeContext = createContext();
 
