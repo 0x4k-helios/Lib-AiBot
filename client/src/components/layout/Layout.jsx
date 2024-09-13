@@ -1,4 +1,3 @@
-import React from "react";
 import { useLocation } from "react-router-dom";
 import Header from "./Header";
 import Footer from "./Footer";
@@ -7,7 +6,7 @@ import FaviconSwitcher from "../../FaviconSwitcher";
 // eslint-disable-next-line react/prop-types
 const Layout = ({ children }) => {
   const location = useLocation();
-  const shouldShowFooter = location.pathname !== "/catalog/ai";
+  const shouldShowFooter = location.pathname !== "/catalog/ai"; // Hide footer on AI page
 
   return (
     <>

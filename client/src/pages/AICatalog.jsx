@@ -1,12 +1,15 @@
-import React, { useState } from "react";
-import Chat from "../components/Chat";
-import BreadcrumbNav from "../components/BreadCrumbNav";
+import { useState } from "react";
+import Chat from "../components/AICatalog/Chat";
+import BreadcrumbNav from "../components/ui/BreadCrumbNav";
 import { Database, Search } from "lucide-react";
 import PageTitle from "../PageTitle";
 
+// AICatalog component to provide an AI-assisted book cataloging interface
 const AICatalog = () => {
+  // State to manage the current query
   const [query, setQuery] = useState("");
 
+  // List of prompt suggestions for the user
   const promptSuggestions = [
     "Find information about the book 'To Kill a Mockingbird' by Harper Lee",
     "Search for books by Gabriel García Márquez",
@@ -25,14 +28,17 @@ const AICatalog = () => {
     "Search for books by Agatha Christie",
   ];
 
+  // Function to get random suggestions from the list
   const getRandomSuggestions = (count = 6) => {
     return [...promptSuggestions]
       .sort(() => 0.5 - Math.random())
       .slice(0, count);
   };
 
+  // Get a set of random suggestions to display
   const displayedSuggestions = getRandomSuggestions();
 
+  // Handle click on a suggestion to set it as the current query
   const handleSuggestionClick = (suggestion) => {
     setQuery(suggestion);
   };

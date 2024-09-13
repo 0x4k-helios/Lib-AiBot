@@ -3,59 +3,58 @@ import { ThemeContext } from "../../context/ThemeContext";
 import useClickOutside from "../../hooks/useClickOutside";
 import { Sun, Moon, Monitor } from "lucide-react";
 
+// Define theme options
+const themes = [
+  { name: "light", icon: Sun, label: "Light" },
+  { name: "dark", icon: Moon, label: "Dark" },
+  { name: "system", icon: Monitor, label: "System" },
+];
+
 const ThemeToggle = () => {
   const { theme, setMode } = useContext(ThemeContext);
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
 
+  // Close dropdown when clicking outside
   useClickOutside(dropdownRef, () => setIsOpen(false));
 
+  // Handle theme change
   const handleToggle = (newTheme) => {
     setMode(newTheme);
     setIsOpen(false);
   };
 
-  const themes = [
-    { name: "light", icon: Sun, label: "Light" },
-    { name: "dark", icon: Moon, label: "Dark" },
-    { name: "system", icon: Monitor, label: "System" },
-  ];
-
+  // Get current theme object
   const getCurrentTheme = () =>
     themes.find((t) => t.name === theme) || themes[0];
 
   return (
     <div className="relative" ref={dropdownRef}>
-      <button
+      <ToggleButton
+        currentTheme={getCurrentTheme()}
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center space-x-2 rounded-full bg-gray-100 p-2 text-gray-700 transition-all duration-300 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-300 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 dark:focus:ring-blue-700"
-        aria-label="Theme toggle"
-      >
-        <CurrentThemeIcon theme={getCurrentTheme()} />
-      </button>
-      <div
-        className={`absolute right-0 mt-2 w-48 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 transition-all duration-300 dark:bg-gray-800 ${isOpen ? "scale-100 transform opacity-100" : "pointer-events-none scale-95 transform opacity-0"} `}
-      >
-        <div
-          className="py-1"
-          role="menu"
-          aria-orientation="vertical"
-          aria-labelledby="theme-menu"
-        >
-          {themes.map((t) => (
-            <ThemeOption
-              key={t.name}
-              theme={t}
-              isActive={t.name === theme}
-              onClick={() => handleToggle(t.name)}
-            />
-          ))}
-        </div>
-      </div>
+      />
+      <ThemeDropdown
+        isOpen={isOpen}
+        currentTheme={theme}
+        onThemeSelect={handleToggle}
+      />
     </div>
   );
 };
 
+// Toggle button component
+const ToggleButton = ({ currentTheme, onClick }) => (
+  <button
+    onClick={onClick}
+    className="flex items-center space-x-2 rounded-full bg-gray-100 p-2 text-gray-700 transition-all duration-300 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-300 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 dark:focus:ring-blue-700"
+    aria-label="Theme toggle"
+  >
+    <CurrentThemeIcon theme={currentTheme} />
+  </button>
+);
+
+// Current theme icon component
 const CurrentThemeIcon = ({ theme }) => {
   const Icon = theme.icon;
   return (
@@ -65,6 +64,34 @@ const CurrentThemeIcon = ({ theme }) => {
   );
 };
 
+// Theme dropdown component
+const ThemeDropdown = ({ isOpen, currentTheme, onThemeSelect }) => (
+  <div
+    className={`absolute right-0 mt-2 w-48 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 transition-all duration-300 dark:bg-gray-800 ${
+      isOpen
+        ? "scale-100 transform opacity-100"
+        : "pointer-events-none scale-95 transform opacity-0"
+    }`}
+  >
+    <div
+      className="py-1"
+      role="menu"
+      aria-orientation="vertical"
+      aria-labelledby="theme-menu"
+    >
+      {themes.map((theme) => (
+        <ThemeOption
+          key={theme.name}
+          theme={theme}
+          isActive={theme.name === currentTheme}
+          onClick={() => onThemeSelect(theme.name)}
+        />
+      ))}
+    </div>
+  </div>
+);
+
+// Individual theme option component
 const ThemeOption = ({ theme, isActive, onClick }) => {
   const Icon = theme.icon;
   return (
@@ -73,7 +100,7 @@ const ThemeOption = ({ theme, isActive, onClick }) => {
         isActive
           ? "bg-blue-100 text-blue-900 dark:bg-blue-900 dark:text-blue-100"
           : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
-      } `}
+      }`}
       onClick={onClick}
     >
       <Icon size={18} className="mr-3" />

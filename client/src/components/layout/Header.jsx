@@ -3,27 +3,30 @@ import { NavLink, useLocation } from "react-router-dom";
 import { Menu, X, ChevronDown } from "lucide-react";
 import ThemeToggle from "../ui/ThemeToggle";
 
+// Define navigation items
+const navItems = [
+  {
+    path: "/catalog",
+    label: "Catalog",
+    submenu: [
+      { path: "/catalog/manual", label: "Manual Cataloging" },
+      { path: "/catalog/ai", label: "AI-Assisted Cataloging" },
+    ],
+  },
+  { path: "/classification", label: "Classification" },
+  { path: "/indexes", label: "Indexes" },
+  { path: "/authority", label: "Authority" },
+];
+
 const Header = () => {
+  // State for mobile menu, scroll status, and catalog submenu
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isCatalogOpen, setIsCatalogOpen] = useState(false);
   const location = useLocation();
   const catalogRef = useRef(null);
 
-  const navItems = [
-    {
-      path: "/catalog",
-      label: "Catalog",
-      submenu: [
-        { path: "/catalog/manual", label: "Manual Cataloging" },
-        { path: "/catalog/ai", label: "AI-Assisted Cataloging" },
-      ],
-    },
-    { path: "/classification", label: "Classification" },
-    { path: "/indexes", label: "Indexes" },
-    { path: "/authority", label: "Authority" },
-  ];
-
+  // Effect to handle scroll and clicks outside the catalog menu
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 10);
     const handleClickOutside = (event) => {
@@ -41,15 +44,18 @@ const Header = () => {
     };
   }, []);
 
+  // Close menus on route change
   useEffect(() => {
     setIsMenuOpen(false);
     setIsCatalogOpen(false);
   }, [location.pathname]);
 
+  // Toggle catalog submenu
   const toggleCatalog = () => {
     setIsCatalogOpen(!isCatalogOpen);
   };
 
+  // Render navigation items
   const renderNavItems = (isMobile = false) => {
     return navItems.map((item) => (
       <div
@@ -58,6 +64,7 @@ const Header = () => {
         ref={item.submenu ? catalogRef : null}
       >
         {item.submenu ? (
+          // Render submenu for Catalog
           <>
             <button
               onClick={toggleCatalog}
@@ -105,6 +112,7 @@ const Header = () => {
             )}
           </>
         ) : (
+          // Render regular menu item
           <NavLink
             to={item.path}
             className={({ isActive }) =>
@@ -133,6 +141,7 @@ const Header = () => {
     >
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between py-4">
+          {/* Logo */}
           <NavLink
             to="/"
             className="group relative text-3xl font-light tracking-tight text-gray-800 transition-colors duration-300 dark:text-gray-100"
@@ -146,8 +155,10 @@ const Header = () => {
             <span className="absolute -bottom-1 left-0 h-0.5 w-0 bg-blue-600 transition-all duration-300 group-hover:w-full dark:bg-blue-400"></span>
           </NavLink>
 
+          {/* Desktop Navigation */}
           <nav className="hidden space-x-1 md:flex">{renderNavItems()}</nav>
 
+          {/* Mobile Menu Button and Theme Toggle */}
           <div className="flex items-center space-x-4">
             <button
               className="rounded-full p-2 text-gray-600 transition-colors duration-300 hover:bg-gray-100 hover:text-blue-600 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-blue-400 md:hidden"
@@ -159,6 +170,7 @@ const Header = () => {
           </div>
         </div>
 
+        {/* Mobile Navigation */}
         {isMenuOpen && (
           <nav className="space-y-1 pb-4 md:hidden">{renderNavItems(true)}</nav>
         )}

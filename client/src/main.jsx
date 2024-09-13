@@ -4,21 +4,18 @@ import App from "./App.jsx";
 import "./index.css";
 import { BrowserRouter } from "react-router-dom";
 import ThemeProvider from "./context/ThemeContext.jsx";
-import { ChakraProvider } from "@chakra-ui/react";
 import { HelmetProvider } from "react-helmet-async";
-import ErrorBoundary from "./ErrorBoundary.jsx"; // Import ErrorBoundary
+import ErrorBoundary from "./ErrorBoundary.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <BrowserRouter>
       <ThemeProvider>
-        <ChakraProvider>
-          <HelmetProvider>
-            <ErrorBoundary>
-              <App />
-            </ErrorBoundary>
-          </HelmetProvider>
-        </ChakraProvider>
+        <HelmetProvider>
+          <ErrorBoundary>
+            <App />
+          </ErrorBoundary>
+        </HelmetProvider>
       </ThemeProvider>
     </BrowserRouter>
   </React.StrictMode>,
