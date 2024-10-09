@@ -52,13 +52,13 @@ const HomePage = () => {
           </div>
           <h1 className="mb-4 text-4xl font-extrabold text-gray-900 dark:text-white sm:text-5xl">
             <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-              Library Cataloging
+              Library Meta Bot
             </span>{" "}
             System
           </h1>
           <p className="mx-auto max-w-2xl text-xl text-gray-600 dark:text-gray-300">
             Revolutionize your library management with our comprehensive,
-            AI-powered cataloging tools
+            AI-powered cataloging tools & metadata management system.
           </p>
         </header>
 

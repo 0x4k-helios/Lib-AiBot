@@ -1,27 +1,21 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { AlertCircle } from "lucide-react";
 import PageTitle from "../PageTitle";
 import api from "../utils/api";
-import ClassificationForm from "../components/classification/ClassificationForm";
-import ClassificationResult from "../components/classification/ClassificationResult";
+import MetadataValidationForm from "../components/authorityControl/MetadataValidationForm";
+import MetadataValidationResult from "../components/authorityControl/MetadataValidationResult";
+import AuthorityBreadCrumb from "../components/ui/AuthorityBreadCrumb";
 
-// Classification component to classify bibliographic records
-function Classification() {
-  // State to manage bibliographic records
+function MetadataValidation() {
   const [bibliographicRecords, setBibliographicRecords] = useState([]);
-  // State to manage the classification result
-  const [classification, setClassification] = useState(null);
-  // State to manage alert messages
+  const [validationResult, setValidationResult] = useState(null);
   const [message, setMessage] = useState(null);
-  // State to manage the type of alert message
   const [messageType, setMessageType] = useState(null);
 
-  // Fetch bibliographic records on component mount
   useEffect(() => {
     fetchBibliographicRecords();
   }, []);
 
-  // Clear the message after 6 seconds
   useEffect(() => {
     if (message) {
       const timer = setTimeout(() => {
@@ -32,11 +26,9 @@ function Classification() {
     }
   }, [message]);
 
-  // Function to fetch bibliographic records from the API
   const fetchBibliographicRecords = async () => {
     try {
       const response = await api.get("/bibliographic");
-      // Filter out duplicate records based on ISBN
       const uniqueRecords = response.data.filter(
         (record, index, self) =>
           index === self.findIndex((r) => r.isbn === record.isbn),
@@ -44,31 +36,34 @@ function Classification() {
       setBibliographicRecords(uniqueRecords);
     } catch (error) {
       console.error("Error fetching bibliographic records:", error);
+      setMessage("Error fetching records. Please try again.");
+      setMessageType("error");
     }
   };
 
-  // Function to handle classification of a selected bibliographic record
-  const handleClassify = async (selectedBibliographicId) => {
+  const handleValidate = async (selectedBibliographicId) => {
     try {
-      const response = await api.post("/classification/classify", {
+      const response = await api.post("/metadata/validate", {
         bibliographicId: selectedBibliographicId,
       });
-      setMessage(response.data.message);
-      setMessageType(
-        response.data.message === "Classification already exists"
-          ? "warning"
-          : "success",
-      );
-      setClassification(response.data.classification);
+      setMessage("Validation completed successfully");
+      setMessageType("success");
+      setValidationResult({
+        isValid: true,
+        metadata: response.data.metadata,
+      });
     } catch (error) {
       setMessage(
         error.response?.data?.error || error.message || "An error occurred",
       );
       setMessageType("error");
+      setValidationResult({
+        isValid: false,
+        errors: [error.response?.data?.error || error.message],
+      });
     }
   };
 
-  // Function to close the alert message
   const closeAlert = () => {
     setMessage(null);
     setMessageType(null);
@@ -76,17 +71,20 @@ function Classification() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white px-4 py-12 dark:from-gray-900 dark:to-gray-800 dark:text-white">
-      <PageTitle title="Classification" />
-      <div className="container mx-auto max-w-4xl">
-        <h1 className="mb-8 text-center text-3xl font-bold">
-          Classify Bibliographic Record
+      <PageTitle title="Metadata Validation" />
+      <div className="container mx-auto max-w-5xl">
+        <AuthorityBreadCrumb />
+        <h1 className="mb-4 mt-2 text-center text-2xl font-bold md:mb-4 md:mt-4 md:text-3xl">
+          Validate Metadata
         </h1>
         <div className="rounded-lg bg-white p-6 shadow-lg dark:bg-gray-800">
-          <ClassificationForm
-            bibliographicRecords={bibliographicRecords}
-            onClassify={handleClassify}
-          />
-          <ClassificationResult classification={classification} />
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <MetadataValidationForm
+              bibliographicRecords={bibliographicRecords}
+              onValidate={handleValidate}
+            />
+            <MetadataValidationResult validationResult={validationResult} />
+          </div>
         </div>
       </div>
       {message && (
@@ -115,4 +113,4 @@ function Classification() {
   );
 }
 
-export default Classification;
+export default MetadataValidation;

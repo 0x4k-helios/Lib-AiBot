@@ -10,8 +10,7 @@ const Footer = () => {
         <div className="flex flex-col items-center justify-between space-y-4 sm:flex-row sm:space-y-0">
           <div className="text-center sm:text-left">
             <p className="text-sm">
-              &copy; {currentYear} Library Cataloging System. All rights
-              reserved.
+              &copy; {currentYear} Library Meta Bot. All rights reserved.
             </p>
           </div>
           <NavLink

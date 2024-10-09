@@ -12,6 +12,7 @@ const Index = require('../models/indexModel');
 const { createIndex } = require('../utils/indexUtils');
 const { fetchBookDetails } = require('../utils/bookUtils');
 const { createDynamicModel, addItemToCollection, getAllCollections } = require('../utils/dynamicSchemaUtils');
+const { extractMetadataFromJson, extractMetadataFromXml, ensureRequiredFields, validateMetadataValues, extractMetadataFromCsv } = require('../utils/metadataUtils');
 const mongoose = require('mongoose');
 
 exports.getBookDetails = async (req, res) => {
@@ -292,7 +293,6 @@ exports.createIndex = async (req, res) => {
 };
 
 // Create Schemas and fields for collections.
-
 exports.createCollection = async (req, res) => {
 	const { collectionName, fields } = req.body;
 
@@ -325,39 +325,123 @@ exports.getAllCollections = async (req, res) => {
 	}
 };
 
-const { extractMetadataFromJson, extractMetadataFromXml, ensureRequiredFields, validateMetadataValues, extractMetadataFromCsv } = require('../utils/metadataUtils');
+// exports.extractMetadata = async (req, res) => {
+// 	const { format, data } = req.body;
 
+// 	try {
+// 		let metadata;
+// 		if (format === 'json') {
+// 			metadata = extractMetadataFromJson(data);
+// 		} else if (format === 'xml') {
+// 			metadata = await extractMetadataFromXml(data);
+// 		} else if (format === 'csv') {
+// 			metadata = await extractMetadataFromCsv(data);
+// 		} else {
+// 			throw new Error('Unsupported format');
+// 		}
+
+// 		res.status(200).json({ metadata });
+// 	} catch (error) {
+// 		res.status(400).json({ error: error.message });
+// 	}
+// };
 exports.extractMetadata = async (req, res) => {
-	const { format, data } = req.body;
+	const { bibliographicId, data, format } = req.body;
 
 	try {
-		let metadata;
-		if (format === 'json') {
-			metadata = extractMetadataFromJson(data);
-		} else if (format === 'xml') {
-			metadata = await extractMetadataFromXml(data);
-		} else if (format === 'csv') {
-			metadata = await extractMetadataFromCsv(data);
+		let record;
+		if (bibliographicId) {
+			// Fetch the bibliographic record if bibliographicId is provided
+			record = await Bibliographic.findById(bibliographicId);
+			if (!record) {
+				return res.status(404).json({ error: 'Bibliographic record not found' });
+			}
+		} else if (data) {
+			// Use the provided data if bibliographicId is not available
+			record = data;
 		} else {
-			throw new Error('Unsupported format');
+			return res.status(400).json({ error: 'Either bibliographicId or data must be provided' });
+		}
+		if (!record) {
+			return res.status(404).json({ error: 'Bibliographic record not found' });
 		}
 
-		res.status(200).json({ metadata });
+		let extractedMetadata;
+		switch (format.toLowerCase()) {
+			case 'json':
+				extractedMetadata = extractMetadataFromJson(record);
+				break;
+			case 'xml':
+				extractedMetadata = await extractMetadataFromXml(record);
+				break;
+			case 'csv':
+				extractedMetadata = await extractMetadataFromCsv(record);
+				break;
+			default:
+				return res.status(400).json({ error: 'Unsupported format' });
+		}
+
+		res.json({
+			message: 'Metadata extracted successfully',
+			metadata: extractedMetadata,
+		});
 	} catch (error) {
-		res.status(400).json({ error: error.message });
+		console.error('Error in extractMetadata:', error);
+		res.status(500).json({ error: 'An error occurred while extracting metadata' });
 	}
 };
 
-exports.ensureQuality = (req, res) => {
-	const { metadata, requiredFields, validationRules } = req.body;
+// exports.ensureQuality = (req, res) => {
+// 	const { metadata, requiredFields, validationRules } = req.body;
+
+// 	try {
+// 		let Metafields = ensureRequiredFields(metadata, requiredFields);
+// 		let ValidStatus = validateMetadataValues(metadata, validationRules);
+
+// 		res.status(200).json({ message: 'Metadata is valid', Metafields, ValidStatus });
+// 	} catch (error) {
+// 		res.status(400).json({ error: error.message });
+// 	}
+// };
+
+exports.validateMetadata = async (req, res) => {
+	const { bibliographicId } = req.body;
 
 	try {
-		let Metafields = ensureRequiredFields(metadata, requiredFields);
-		let ValidStatus = validateMetadataValues(metadata, validationRules);
+		// Fetch the bibliographic record
+		const record = await Bibliographic.findById(bibliographicId);
+		if (!record) {
+			return res.status(404).json({ error: 'Bibliographic record not found' });
+		}
 
-		res.status(200).json({ message: 'Metadata is valid', Metafields, ValidStatus });
+		// Perform basic validation
+		const errors = [];
+		if (!record.title) errors.push('Title is required');
+		if (!record.author) errors.push('Author is required');
+		if (!record.isbn) errors.push('ISBN is required');
+		if (!record.publicationDate) errors.push('Publication date is required');
+
+		// Check ISBN format (simple check for 10 or 13 digits)
+		if (record.isbn && !/^\d{10}(\d{3})?$/.test(record.isbn)) {
+			errors.push('Invalid ISBN format');
+		}
+
+		if (errors.length > 0) {
+			return res.status(400).json({ errors });
+		}
+
+		// If validation passes, return the validated metadata
+		res.json({
+			message: 'Metadata is valid',
+			metadata: {
+				title: record.title,
+				author: record.author,
+				publicationDate: record.publicationDate,
+				isbn: record.isbn,
+			},
+		});
 	} catch (error) {
-		res.status(400).json({ error: error.message });
+		res.status(500).json({ error: 'An error occurred during validation' });
 	}
 };
 

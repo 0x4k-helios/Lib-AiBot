@@ -1,5 +1,5 @@
 import { useState } from "react";
-import Chat from "../components/AICatalog/Chat";
+import Chat from "../components/aiCatalog/Chat";
 import BreadcrumbNav from "../components/ui/BreadCrumbNav";
 import { Database, Search } from "lucide-react";
 import PageTitle from "../PageTitle";

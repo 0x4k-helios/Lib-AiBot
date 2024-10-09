@@ -15,7 +15,14 @@ const navItems = [
   },
   { path: "/classification", label: "Classification" },
   { path: "/indexes", label: "Indexes" },
-  { path: "/authority", label: "Authority" },
+  {
+    path: "/authority",
+    label: "Authority",
+    // submenu: [
+    //   { path: "/authority/extract", label: "Metadata Extraction" },
+    //   { path: "/authority/validate", label: "Metadata Validation" },
+    // ],
+  },
 ];
 
 const Header = () => {
@@ -25,6 +32,11 @@ const Header = () => {
   const [isCatalogOpen, setIsCatalogOpen] = useState(false);
   const location = useLocation();
   const catalogRef = useRef(null);
+
+  // Scroll restoration function
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
 
   // Effect to handle scroll and clicks outside the catalog menu
   useEffect(() => {
@@ -150,7 +162,7 @@ const Header = () => {
               Lib
             </span>
             <span className="inline-block font-bold text-blue-600 transition-all duration-300 group-hover:translate-y-1 dark:text-blue-400">
-              Catalog
+              MetaBot
             </span>
             <span className="absolute -bottom-1 left-0 h-0.5 w-0 bg-blue-600 transition-all duration-300 group-hover:w-full dark:bg-blue-400"></span>
           </NavLink>

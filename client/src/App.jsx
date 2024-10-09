@@ -8,7 +8,10 @@ import ManualCatalog from "./pages/ManualCatalog";
 import AICatalog from "./pages/AICatalog";
 import Classification from "./pages/Classifcation";
 import Indexes from "./pages/Indexes";
-import Authority from "./pages/Authority";
+import Authority from "./pages/AuthorityControl";
+import AuthorityRecordManagement from "./pages/AuthorityRecordManagement";
+import MetadataExtraction from "./pages/MetadataExtraction";
+import MetadataValidation from "./pages/MetadataValidation";
 
 // Define routes configuration
 const routes = [
@@ -18,6 +21,9 @@ const routes = [
   { path: "/classification", element: Classification },
   { path: "/indexes", element: Indexes },
   { path: "/authority", element: Authority },
+  { path: "/authority/records", element: AuthorityRecordManagement },
+  { path: "/authority/extract", element: MetadataExtraction },
+  { path: "/authority/validate", element: MetadataValidation },
 ];
 
 function App() {

@@ -29,7 +29,7 @@ const EmptyState = () => (
       <FaBook className="h-8 w-8 text-blue-500 dark:text-blue-300" />
     </div>
     <h2 className="mb-2 text-xl font-bold text-gray-700 dark:text-gray-300">
-      LibCatalog AI Assistant
+      AI Assistant
     </h2>
     <p className="max-w-md text-sm text-gray-500 dark:text-gray-400 md:text-base">
       Your intelligent companion for library management.

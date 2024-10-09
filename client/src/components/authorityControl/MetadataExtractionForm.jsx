@@ -1,16 +1,12 @@
 import { useState, useEffect } from "react";
-import { Book, RefreshCw } from "lucide-react";
+import { Database, RefreshCw } from "lucide-react";
 
-// ClassificationForm component to classify a bibliographic record
-function ClassificationForm({ bibliographicRecords, onClassify }) {
-  // State to manage the selected bibliographic record ID
+function MetadataExtractionForm({ bibliographicRecords, onExtract }) {
   const [selectedBibliographicId, setSelectedBibliographicId] = useState("");
-  // State to manage form validation errors
+  const [selectedFormat, setSelectedFormat] = useState("json");
   const [errors, setErrors] = useState({});
-  // State to manage the submission status
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Clear validation errors after 6 seconds
   useEffect(() => {
     const errorTimers = Object.keys(errors).map((key) =>
       setTimeout(() => {
@@ -27,12 +23,14 @@ function ClassificationForm({ bibliographicRecords, onClassify }) {
     };
   }, [errors]);
 
-  // Handle change in the select input
-  const handleChange = (e) => {
+  const handleBibliographicChange = (e) => {
     setSelectedBibliographicId(e.target.value);
   };
 
-  // Validate the form input
+  const handleFormatChange = (e) => {
+    setSelectedFormat(e.target.value);
+  };
+
   const validate = () => {
     const newErrors = {};
     if (!selectedBibliographicId)
@@ -40,7 +38,6 @@ function ClassificationForm({ bibliographicRecords, onClassify }) {
     return newErrors;
   };
 
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     const validationErrors = validate();
@@ -52,7 +49,7 @@ function ClassificationForm({ bibliographicRecords, onClassify }) {
     setIsSubmitting(true);
 
     try {
-      await onClassify(selectedBibliographicId);
+      await onExtract(selectedBibliographicId, selectedFormat);
       setSelectedBibliographicId("");
     } finally {
       setIsSubmitting(false);
@@ -61,23 +58,23 @@ function ClassificationForm({ bibliographicRecords, onClassify }) {
 
   return (
     <form onSubmit={handleSubmit} className="mb-6">
-      <div className="mb-6 flex items-center justify-center">
-        <Book className="mr-2 h-6 w-6 text-blue-500" />
-        <p className="text-center text-lg font-semibold">
-          ISBN to DDC or LCC Classification
+      <div className="mb-6 flex flex-col items-center justify-center sm:flex-row">
+        <Database className="mr-2 h-6 w-6 text-blue-500" />
+        <p className="text-center text-base font-semibold md:text-lg">
+          Extract Metadata from Bibliographic Record
         </p>
       </div>
       <label className="mb-2 block font-semibold text-gray-700 dark:text-gray-300">
-        Select ISBN or Title
+        Select a Bibliographic Record
       </label>
       <select
         name="bibliographicId"
         value={selectedBibliographicId}
-        onChange={handleChange}
+        onChange={handleBibliographicChange}
         className="mb-4 w-full rounded-md border border-gray-300 bg-gray-50 p-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
       >
         <option value="" disabled>
-          Select a bibliographic record
+          Select a record
         </option>
         {bibliographicRecords.map((record) => (
           <option key={record._id} value={record._id}>
@@ -88,6 +85,23 @@ function ClassificationForm({ bibliographicRecords, onClassify }) {
       {errors.bibliographicId && (
         <p className="mb-4 text-sm text-red-500">{errors.bibliographicId}</p>
       )}
+      <label className="mb-2 block font-semibold text-gray-700 dark:text-gray-300">
+        Select Format
+      </label>
+      <select
+        name="format"
+        value={selectedFormat}
+        onChange={handleFormatChange}
+        className="mb-4 w-full rounded-md border border-gray-300 bg-gray-50 p-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+      >
+        <option value="json">JSON</option>
+        <option value="xml" disabled>
+          XML
+        </option>
+        <option value="csv" disabled>
+          CSV
+        </option>
+      </select>
       <button
         type="submit"
         className="w-full rounded-md bg-blue-500 py-2 font-semibold text-white transition-colors hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75 disabled:bg-blue-300"
@@ -96,14 +110,14 @@ function ClassificationForm({ bibliographicRecords, onClassify }) {
         {isSubmitting ? (
           <div className="flex items-center justify-center">
             <RefreshCw className="mr-2 h-5 w-5 animate-spin" />
-            <span>Classifying...</span>
+            <span>Extracting...</span>
           </div>
         ) : (
-          <span>Classify</span>
+          <span>Extract Metadata</span>
         )}
       </button>
     </form>
   );
 }
 
-export default ClassificationForm;
+export default MetadataExtractionForm;
