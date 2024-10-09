@@ -4,6 +4,7 @@ import { Book, Database, Search, List, Users, ArrowRight } from "lucide-react";
 import PageTitle from "../PageTitle";
 
 const HomePage = () => {
+  // Define features with icons, titles, descriptions, and gradient colors
   const features = [
     {
       to: "/catalog/manual",
