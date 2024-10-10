@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { AlertCircle } from "lucide-react";
 import PageTitle from "../PageTitle";
 import api from "../utils/api";
-import ClassificationForm from "../components/classification/ClassificationForm";
-import ClassificationResult from "../components/classification/ClassificationResult";
+import ClassificationForm from "../components/ClassificationForm";
+import ClassificationResult from "../components/ClassificationResult";
 
 // Classification component to classify bibliographic records
 function Classification() {
