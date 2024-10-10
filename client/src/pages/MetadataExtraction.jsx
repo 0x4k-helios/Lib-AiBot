@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import { AlertCircle } from "lucide-react";
 import PageTitle from "../PageTitle";
 import api from "../utils/api";
-import MetadataExtractionForm from "../components/authorityControl/MetadataExtractionForm";
-import MetadataExtractionResult from "../components/authorityControl/MetadataExtractionResult";
+import MetadataExtractionForm from "../components/authority-control/MetadataExtractionForm";
+import MetadataExtractionResult from "../components/authority-control/MetadataExtractionResult";
 import AuthorityBreadCrumb from "../components/ui/AuthorityBreadCrumb";
 
 function MetadataExtraction() {

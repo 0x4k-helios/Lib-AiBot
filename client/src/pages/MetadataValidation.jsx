@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import { AlertCircle } from "lucide-react";
 import PageTitle from "../PageTitle";
 import api from "../utils/api";
-import MetadataValidationForm from "../components/authorityControl/MetadataValidationForm";
-import MetadataValidationResult from "../components/authorityControl/MetadataValidationResult";
+import MetadataValidationForm from "../components/authority-control/MetadataValidationForm";
+import MetadataValidationResult from "../components/authority-control/MetadataValidationResult";
 import AuthorityBreadCrumb from "../components/ui/AuthorityBreadCrumb";
 
 function MetadataValidation() {
