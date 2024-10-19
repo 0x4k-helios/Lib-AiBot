@@ -24,10 +24,10 @@ const Indexes = () => {
     { ddcCode: "300", title: "Social sciences" },
     { ddcCode: "400", title: "Language" },
     { ddcCode: "500", title: "Science" },
-    // { ddcCode: "600", title: "Technology" },
-    // { ddcCode: "700", title: "Arts & recreation" },
-    // { ddcCode: "800", title: "Literature" },
-    // { ddcCode: "900", title: "History & geography" },
+    { ddcCode: "600", title: "Technology" },
+    { ddcCode: "700", title: "Arts & recreation" },
+    { ddcCode: "800", title: "Literature" },
+    { ddcCode: "900", title: "History & geography" },
   ]);
 
   useEffect(() => {
@@ -194,14 +194,18 @@ const Indexes = () => {
         <h1 className="mb-2 text-center text-4xl font-bold text-gray-800 dark:text-white">
           Indexing Dashboard
         </h1>
-        <p className="mb-8 text-center text-lg text-gray-600 dark:text-gray-300">
+        <p className="text-center text-lg text-gray-600 dark:text-gray-300">
           Manage DDC mappings and generate subject headings for your
           bibliographic records.
         </p>
 
+        <p className="mb-8 mt-3 animate-pulse text-center text-base italic text-gray-600 dark:text-gray-400">
+          Note that most of these operations are for demo purposes only.
+        </p>
+
         {message && (
           <div
-            className={`fixed bottom-4 right-4 z-50 rounded p-4 shadow-lg ${
+            className={`fixed bottom-4 left-4 right-4 z-50 w-fit rounded p-4 shadow-lg sm:left-auto ${
               messageType === "success"
                 ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
                 : messageType === "warning"

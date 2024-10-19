@@ -1,10 +1,4 @@
-const ChatInput = ({
-  query,
-  setQuery,
-  onQueryChange,
-  handleSubmit,
-  isLoading,
-}) => {
+const ChatInput = ({ query, setQuery, handleSubmit, isLoading }) => {
   return (
     <div className="fixed bottom-0 left-1/2 w-full max-w-6xl -translate-x-1/2 px-4">
       <div className="rounded-2xl border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800">
@@ -13,10 +7,7 @@ const ChatInput = ({
             <input
               type="text"
               value={query}
-              onChange={(e) => {
-                setQuery(e.target.value);
-                onQueryChange(e.target.value);
-              }}
+              onChange={(e) => setQuery(e.target.value)}
               placeholder="Ask about a book or any library-related question..."
               className="w-full rounded-xl border-0 bg-gray-100 py-3 pl-4 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
             />

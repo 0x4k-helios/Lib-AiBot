@@ -56,7 +56,9 @@ function MetadataExtraction() {
         metadata: {
           title: response.data.metadata.title,
           author: response.data.metadata.author,
-          publicationDate: new Date(response.data.metadata.publicationDate),
+          publicationDate: new Date(response.data.metadata.publicationDate)
+            .toISOString()
+            .split("T")[0],
           isbn: response.data.metadata.isbn,
         },
       });

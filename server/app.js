@@ -81,111 +81,137 @@ app.post('/query', async (req, res) => {
 	const { query } = req.body;
 
 	try {
-		// Get the AI-generated response to determine the action
 		const aiResponse = await generateResponse(query);
 		console.log('AI Response:', aiResponse);
 
-		let searchResults = {};
-		let userMessage = '';
-
 		if (aiResponse.action === 'fetch_book_info') {
-			const { title, author, isbn, classification } = aiResponse.parameters;
+			const { title, author, isbn, series } = aiResponse.parameters;
 
-			// Construct query parameters for Open Library API
-			let queryParams = new URLSearchParams();
-			if (isbn) queryParams.append('q', `isbn:${isbn}`);
-			if (title) queryParams.append('title', title);
-			if (author) queryParams.append('author', author);
-			if (classification) queryParams.append('subject', classification);
-			if (aiResponse.parameters.page) queryParams.append('page', aiResponse.parameters.page);
-			if (aiResponse.parameters.sort) queryParams.append('sort', aiResponse.parameters.sort);
-
-			// Construct Open Library API URL
-			const openLibraryApiUrl = `https://openlibrary.org/search.json?${queryParams.toString()}`;
-			console.log('Open Library API URL:', openLibraryApiUrl);
-
-			let response = await axios.get(openLibraryApiUrl);
-			let openLibraryData = response.data;
-
-			// Debug log for Open Library API response
-			console.log('Open Library API Response:', openLibraryData);
-
-			// Check if Open Library response is empty and fallback to Google Books API
-			if (openLibraryData.num_found === 0 && isbn) {
-				// Construct Google Books API URL
-				const googleBooksApiUrl = `https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}`;
-				console.log('Google Books API URL:', googleBooksApiUrl);
-
-				response = await axios.get(googleBooksApiUrl);
-				const googleBooksData = response.data;
-
-				// Debug log for Google Books API response
-				console.log('Google Books API Response:', googleBooksData);
-
-				if (googleBooksData.items && googleBooksData.items.length > 0) {
-					// Format Google Books data
-					openLibraryData = {
-						num_found: googleBooksData.items.length,
-						docs: googleBooksData.items.map((item) => ({
-							key: item.id,
-							title: item.volumeInfo.title || '',
-							author_name: item.volumeInfo.authors || [],
-							cover_i: item.volumeInfo.imageLinks ? item.volumeInfo.imageLinks.thumbnail : '',
-							first_publish_year: item.volumeInfo.publishedDate ? new Date(item.volumeInfo.publishedDate).getFullYear() : '',
-							ia: item.volumeInfo.industryIdentifiers ? item.volumeInfo.industryIdentifiers.map((id) => id.identifier) : [],
-						})),
-					};
-				}
-			}
-
-			// Generate a conversational response with Gemini
-			console.log('Calling the function to be processed');
-			const geminiResponse = await generateResponseWithGemini(query, openLibraryData);
-			userMessage = geminiResponse.message;
-
-			searchResults = {
-				action: 'search_books',
-				message: userMessage,
-				data: openLibraryData, // Send all data returned from Open Library
-			};
-		} else if (aiResponse.action === 'convert_ddc') {
-			// Logic for converting DDC
-			const bookTitle = aiResponse.parameters?.title || '';
-
-			if (!bookTitle) {
-				return res.json({ error: 'No book title provided for conversion.' });
-			}
-
-			const searchUrl = `https://directory.doabooks.org/rest/search?query=dc.title:%22${encodeURIComponent(bookTitle)}%22&expand=metadata`;
-
+			// Try OpenLibrary API first
 			try {
-				const response = await axios.get(searchUrl, { headers: { Accept: 'application/json' } });
-				const books = response.data;
-				if (books.length > 0) {
-					userMessage = `Here are the results for the DDC conversion of the book titled "${bookTitle}".`;
-					searchResults = { action: 'search_books', books };
-				} else {
-					userMessage = `No books were found for the DDC conversion of "${bookTitle}".`;
-					searchResults = { action: 'search_books', message: 'No books found.' };
+				const openLibraryData = await fetchFromOpenLibrary(title, author, isbn, series);
+				const geminiResponse = await generateResponseWithGemini(query, openLibraryData);
+
+				return res.json({
+					action: 'search_books',
+					message: geminiResponse.message,
+					data: openLibraryData,
+				});
+			} catch (openLibraryError) {
+				console.error('OpenLibrary API error:', openLibraryError.message);
+
+				// Fallback to Google Books API
+				try {
+					const googleBooksData = await fetchFromGoogleBooks(title, author, isbn, series);
+					const geminiResponse = await generateResponseWithGemini(query, googleBooksData);
+
+					return res.json({
+						action: 'search_books',
+						message: geminiResponse.message,
+						data: googleBooksData,
+					});
+				} catch (googleBooksError) {
+					console.error('Google Books API error:', googleBooksError.message);
+					throw new Error('Both OpenLibrary and Google Books APIs failed');
 				}
-			} catch (error) {
-				console.error('Error converting DDC:', error);
-				return res.json({ error: 'An error occurred while converting DDC.' });
 			}
 		} else if (aiResponse.action === 'general_response') {
-			// Return the general response
 			return res.json({ action: 'general_response', response: aiResponse.response });
 		} else {
 			return res.status(400).json({ error: 'Invalid action specified.' });
 		}
-
-		// Return the final response with conversational message and search results
-		return res.json({ userMessage, ...searchResults });
 	} catch (error) {
 		console.error('Error processing query:', error.message);
 		res.status(500).json({ error: 'An error occurred while processing the query.' });
 	}
 });
+
+async function generateResponse(query) {
+	try {
+		const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+		const prompt = `Analyze the following user query and determine the appropriate action. The query might be about a book or a book series.
+	  If the query relates to book information (such as fetching details about a book or a series), respond with a JSON object specifying the action: 'fetch_book_info'. Include any relevant parameters such as book title, author, ISBN, or series name in the response.
+	  If the query does not fit these actions, provide a general informative response.
+  
+	  Query: "${query}"`;
+
+		const result = await model.generateContent(prompt);
+		const responseText = await result.response.text();
+
+		console.log('Generated Response:', responseText);
+
+		const jsonStart = responseText.indexOf('{');
+		const jsonEnd = responseText.lastIndexOf('}') + 1;
+
+		if (jsonStart === -1 || jsonEnd === -1) {
+			throw new Error('No valid JSON found in response');
+		}
+
+		const jsonString = responseText.substring(jsonStart, jsonEnd);
+		const aiResponse = JSON.parse(jsonString);
+
+		if (aiResponse.action === 'fetch_book_info') {
+			return {
+				action: aiResponse.action,
+				parameters: {
+					title: aiResponse.title || '',
+					author: aiResponse.author || '',
+					isbn: aiResponse.isbn || '',
+					series: aiResponse.series || '',
+				},
+			};
+		} else {
+			return generateGeneralResponse(query);
+		}
+	} catch (error) {
+		console.error('Error generating content:', error.message);
+		throw error;
+	}
+}
+
+async function fetchFromOpenLibrary(title, author, isbn, series) {
+	let queryParams = new URLSearchParams();
+	if (isbn) queryParams.append('q', `isbn:${isbn}`);
+	if (title) queryParams.append('title', title);
+	if (author) queryParams.append('author', author);
+	if (series) queryParams.append('q', `"${series}"`);
+
+	const openLibraryApiUrl = `https://openlibrary.org/search.json?${queryParams.toString()}`;
+	console.log('Open Library API URL:', openLibraryApiUrl);
+
+	const response = await axios.get(openLibraryApiUrl, { timeout: 5000 });
+	return response.data;
+}
+
+async function fetchFromGoogleBooks(title, author, isbn, series) {
+	let query = [];
+	if (isbn) query.push(`isbn:${isbn}`);
+	if (title) query.push(`intitle:${title}`);
+	if (author) query.push(`inauthor:${author}`);
+	if (series) query.push(`"${series}"`);
+
+	const googleBooksApiUrl = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query.join('+'))}`;
+	console.log('Google Books API URL:', googleBooksApiUrl);
+
+	const response = await axios.get(googleBooksApiUrl, { timeout: 5000 });
+	return formatGoogleBooksResponse(response.data);
+}
+
+function formatGoogleBooksResponse(googleBooksData) {
+	return {
+		num_found: googleBooksData.totalItems,
+		docs: googleBooksData.items
+			? googleBooksData.items.map((item) => ({
+					key: item.id,
+					title: item.volumeInfo.title || '',
+					author_name: item.volumeInfo.authors || [],
+					cover_i: item.volumeInfo.imageLinks ? item.volumeInfo.imageLinks.thumbnail : '',
+					first_publish_year: item.volumeInfo.publishedDate ? new Date(item.volumeInfo.publishedDate).getFullYear() : '',
+					ia: item.volumeInfo.industryIdentifiers ? item.volumeInfo.industryIdentifiers.map((id) => id.identifier) : [],
+			  }))
+			: [],
+	};
+}
 
 async function generateResponse(query) {
 	try {

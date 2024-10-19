@@ -50,7 +50,15 @@ function MetadataValidation() {
       setMessageType("success");
       setValidationResult({
         isValid: true,
-        metadata: response.data.metadata,
+        // metadata: response.data.metadata,
+        metadata: {
+          title: response.data.metadata.title,
+          author: response.data.metadata.author,
+          publicationDate: new Date(response.data.metadata.publicationDate)
+            .toISOString()
+            .split("T")[0],
+          isbn: response.data.metadata.isbn,
+        },
       });
     } catch (error) {
       setMessage(

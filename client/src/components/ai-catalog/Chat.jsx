@@ -37,7 +37,7 @@ const Chat = ({ initialQuery, onQueryChange }) => {
   // Function to handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!query.trim()) return;
+    if (!query.trim()) return; // Do nothing if query is empty
 
     setIsLoading(true);
     setMessages((prev) => [...prev, { type: "user", content: query }]);
@@ -104,7 +104,6 @@ const Chat = ({ initialQuery, onQueryChange }) => {
         <ChatInput
           query={query}
           setQuery={setQuery}
-          onQueryChange={onQueryChange}
           handleSubmit={handleSubmit}
           isLoading={isLoading}
         />

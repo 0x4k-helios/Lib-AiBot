@@ -17,7 +17,7 @@ const MessageContent = ({ message, onCatalog }) => {
     case "ai":
       // Render AI message with optional icons and markdown content
       return (
-        <div className="inline-block rounded-lg bg-white p-4 shadow-md dark:bg-gray-700 dark:text-white">
+        <div className="inline-block max-w-2xl rounded-lg bg-white p-4 shadow-md dark:bg-gray-700 dark:text-white">
           {message.action === "informative" && (
             <FaInfoCircle className="mb-2 text-blue-500" />
           )}
@@ -67,7 +67,12 @@ const MessageContent = ({ message, onCatalog }) => {
       );
     default:
       // Render nothing for unknown message types
-      return null;
+      return (
+        <div className="inline-block rounded-lg bg-gray-200 p-4 text-gray-700">
+          Unknown message type: {message.type}
+        </div>
+        // null
+      );
   }
 };
 

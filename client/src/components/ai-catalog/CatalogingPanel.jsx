@@ -89,7 +89,7 @@ const CatalogingPanel = ({ book, onClose, onCatalogSuccess }) => {
         });
       }
     } catch (error) {
-      console.error("Error cataloging book:", error);
+      console.error("Error cataloging book:", error.message);
       setMessage({
         type: "error",
         content: "An error occurred while cataloging the book.",
